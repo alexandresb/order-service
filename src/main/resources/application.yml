@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: order-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s #durée max pour terminer le traitement des req en cours avant arrêt
+  r2dbc:
+    username: user
+    password: password
+    url: r2dbc:postgresql://localhost:5432/polardb_order
+    pool:
+      max-create-connection-time: 2s # temps max pour obtenir une connexion depuis le pool
+      initial-size: 5
+      max-size: 10 # défaut
+  flyway:
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+    url: jdbc:postgresql://localhost:5432/polardb_order
+
+  config:
+    #importation / récup des propriétés de config depuis un serveur de config quand il y en a 1 de dispo
+    import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8888 #URI par défaut
+      #resilience du client de config
+      request-connect-timeout: 5000 #en ms - temps max pour établir une cnx avec le config server
+      request-read-timeout: 5000 #temps max pour que le container lise la config pour configurer le(s) bean(s)
+      fail-fast: false #true pour que le retry soit mis en oeuvre pour recontacter le config server
+      retry:
+        #utilisation des vals par défaut
+        max-attempts: 20 #j'ai mis 20 au lieu de 6 (val par défaut) pour tester le retry
+        initial-interval: 1000 # en ms. interval de temps écoulé avant la 1ere nouvelle tentative (retry)
+        max-interval: 2000 #interval max pour une tentative - délai à ne pas excéder
+        multiplier: 1.1 # facteur pour calculer le délai qui doit s'écouler avant la tentative suivante
+
+#activation du Ep /actuator/refresh à traver http
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+server:
+  port: 9002
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+polar:
+  catalog-service-uri: "http://localhost:9001"
+  #externalisation des valeurs de configuration de la résilience Reactor
+  timeout: 3
+  max-retry: 3
+  retry-backoff: 100
