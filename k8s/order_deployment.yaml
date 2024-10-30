@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+#Etat désirée pour l'application stateless order-service. Deployment spécifie la création d'un seul pod pour order-service
+spec:
+  replicas: 1 #Par défaut 1 - donc optionnel si 1 seul pod désiré.
+  #Indication du label permettant de déterminer le pod à "répliquer". Doit correspondre à un label indiqué dans template
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      name: order-service #nom du pod
+      #déclaration du label permettant d'identifier le pod (doit correspondre à matchLabels ci-dessus)
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: order-service
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9002
+          # var d'env de configuration de catalog-service lors de son démarrage
+          env:
+            - name: BPL_JVM_THREAD_COUNT # configure le nombre de threads que la JVM peut créer au sein d'un container d'image BuildPacks
+              value: "50"
+            - name: SPRING_R2DBC_URL
+              #pas besoin de spécifier le port d'écoute 5432, car c'est le seul port exposé par le container
+              value: "r2dbc:postgresql://polar-postgres/polardb_order"
+            - name: SPRING_FLYWAY_URL
+              value: "jdbc:postgresql://polar-postgres/polardb_order"
+            - name: POLAR_CATALOG_SERVICE_URI
+              value: "http://catalog-service"
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-service"
+           # - name: SPRING_CLOUD_CONFIG_FAIL_FAST
+           #   value: "true"
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+      
