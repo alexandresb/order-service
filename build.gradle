@@ -47,8 +47,8 @@ dependencies {
 	//dépendance pour intégrer le config client
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.retry:spring-retry'
-
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
 
 	//Flyway
 	runtimeOnly 'org.flywaydb:flyway-core'
@@ -64,6 +64,7 @@ dependencies {
 	testImplementation 'org.testcontainers:postgresql'
 	testImplementation 'org.testcontainers:r2dbc'
 	testImplementation 'com.squareup.okhttp3:mockwebserver'
+	testImplementation'org.springframework.cloud:spring-cloud-stream-test-binder'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

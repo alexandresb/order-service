@@ -19,6 +19,7 @@ spring:
   config:
     #importation / récup des propriétés de config depuis un serveur de config quand il y en a 1 de dispo
     import: "optional:configserver:"
+
   cloud:
     config:
       uri: http://localhost:8888 #URI par défaut
@@ -32,6 +33,28 @@ spring:
         initial-interval: 1000 # en ms. interval de temps écoulé avant la 1ere nouvelle tentative (retry)
         max-interval: 2000 #interval max pour une tentative - délai à ne pas excéder
         multiplier: 1.1 # facteur pour calculer le délai qui doit s'écouler avant la tentative suivante
+    function:
+      definition: consumeOrderDispatchedMessages #déclaration de la prise en charge de la fonction par SCF
+    stream:
+      bindings:
+        consumeOrderDispatchedMessages-in-0: #config de l'input binding - nom dérivé de la fonction SCF associée
+          destination: order-dispatched #l'exchange dans lequel les messages à destination d'order-services sont envoyés par dispatcher-service
+          group: ${spring.application.name} # queue :order-dispatched.order-service - créé lors du déploiement du consommateur order-service
+        #config du binding créé au démarrage (par le binder SCS)
+        acceptOrder-out-0:
+          destination: order-accepted #exchange dans lequel OrderService publie les messages notifiant de l'acceptation de la commande
+      rabbit: #config spécifique du binding pour RabbitMQ
+        bindings:
+          acceptOrder-out-0:
+            producer:
+              transacted: true #intégration du binding dans la transaction
+  #config de l'intégration avec RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
+    connection-timeout: 5s
 
 #activation du Ep /actuator/refresh à traver http
 management:
