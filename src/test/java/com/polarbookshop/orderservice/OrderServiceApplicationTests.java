@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@EnableTestBinder
 class OrderServiceApplicationTests {
 
 	@Container
@@ -160,8 +161,4 @@ class OrderServiceApplicationTests {
 		assertThat(createdOrder.quantity()).isEqualTo(orderRequest.quantity());
 		assertThat(createdOrder.status()).isEqualTo(OrderStatus.REJECTED);
 	}
-	//activation de l'utilisation d'un binder de test
-	@SpringBootApplication
-	@EnableTestBinder
-	public static class EnableTestBinderConfiguration{}
 }
