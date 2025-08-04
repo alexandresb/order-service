@@ -6,6 +6,7 @@ plugins {
 
 ext {
 	springCloudVersion = "2023.0.3"
+	set('testKeycloakVersion',"3.6.0")
 }
 
 group = 'com.polarbookshop'
@@ -49,6 +50,8 @@ dependencies {
 	implementation 'org.springframework.retry:spring-retry'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
+	//dépendance pour configurer en tant que serveur de ressources OAuth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
 	//Flyway
 	runtimeOnly 'org.flywaydb:flyway-core'
@@ -65,6 +68,8 @@ dependencies {
 	testImplementation 'org.testcontainers:r2dbc'
 	testImplementation 'com.squareup.okhttp3:mockwebserver'
 	testImplementation'org.springframework.cloud:spring-cloud-stream-test-binder'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation "com.github.dasniko:testcontainers-keycloak:${testKeycloakVersion}"
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

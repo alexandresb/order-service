@@ -39,6 +39,8 @@ spec:
               value: "http://config-service"
             - name: SPRING_RABBITMQ_HOST
               value: polar-rabbitmq
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: http://polar-keycloak/realms/PolarBookshop
 
           lifecycle:
             preStop:

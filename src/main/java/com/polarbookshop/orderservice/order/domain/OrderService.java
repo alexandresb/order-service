@@ -25,9 +25,9 @@ public class OrderService {
         this.bookClient = bookClient;
         this.streamBridge = streamBridge;
     }
-    public Flux<Order> getAllOrders() {
-       //retourne le flux de sortie émettant les Order
-        return orderRepository.findAll();
+    public Flux<Order> getAllOrders(String userId) {
+       //retourne le flux de sortie émettant les Order d'un utilisateur authentifié
+        return orderRepository.findAllByCreatedBy(userId);
     }
 
     @Transactional//exécution de la méthode dans le contexte d'une transaction englobant la persistance en base et la plublication du message
@@ -77,6 +77,8 @@ public class OrderService {
                 OrderStatus.DISPATCHED,
                 existingOrder.createdDate(),
                 existingOrder.lastModifiedDate(),
+                existingOrder.createdBy(),
+                existingOrder.lastModifiedBy(),
                 existingOrder.version());
     }
 

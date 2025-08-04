@@ -3,6 +3,8 @@ package com.polarbookshop.orderservice.order.web;
 import com.polarbookshop.orderservice.order.domain.Order;
 import com.polarbookshop.orderservice.order.domain.OrderService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,10 +19,12 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    //injection  d'une représentation du principal correspondant à l'utilisateur authentifié
     @GetMapping
-    public Flux<Order> getAllOrders(){
+    public Flux<Order> getAllOrders(@AuthenticationPrincipal Jwt jwt){//injection d'une représentation du principal correspondant à l'utilisateur authentifié
+
        // retourne le flux retourné par order Service qui va émettre les commandes
-        return orderService.getAllOrders();
+        return orderService.getAllOrders(jwt.getSubject());
     }
 
     @PostMapping

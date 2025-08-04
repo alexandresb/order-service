@@ -5,12 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
+
+import java.util.Objects;
 
 @DataR2dbcTest //active l'autoconfiguration pour ce qui relève des tests utilisant R2DBC & le scan des composants est limité au repo et aux entités
 @Import(DataConfig.class)//pour l'activation de l'audit R2DBC
@@ -58,6 +61,28 @@ public class OrderRepositoryR2dbcTests {
     void findNoOrderIfIdNotExist(){
         StepVerifier.create(orderRepository.findById(397L))
                 .expectNextCount(0)
+                .verifyComplete();
+    }
+    @Test
+    void whenCreateOrderNotAuthenticatedThenNoAuditMetadata(){
+        var rejectedOrder = OrderService.buildRejectedOrder("1234567893",3);
+        //vérification qu'orderRepository retourne bien une commande avec un statut rejeté
+        StepVerifier.create(orderRepository.save(rejectedOrder))//create s'abonne au flux Mono retourné par orderRepositorySave
+                .expectNextMatches( order -> Objects.isNull(order.createdBy())
+                && Objects.isNull(order.lastModifiedBy())
+                )
+                .verifyComplete();
+    }
+
+    @Test
+    @WithMockUser("marlena")
+    void whenCreateOrderAuthenticatedThenAuditMetadata(){
+        var rejectedOrder = OrderService.buildRejectedOrder("1234567893",3);
+        //vérification qu'orderRepository retourne bien une commande avec un statut rejeté
+        StepVerifier.create(orderRepository.save(rejectedOrder))//create s'abonne au flux Mono retourné par orderRepositorySave
+                .expectNextMatches( order -> order.createdBy().equals("marlena")
+                        && order.lastModifiedBy().equals("marlena")
+                )
                 .verifyComplete();
     }
 
