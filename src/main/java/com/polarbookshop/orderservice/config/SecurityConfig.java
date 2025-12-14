@@ -14,6 +14,7 @@ public class SecurityConfig {
     SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(exchange ->exchange
+                                                .pathMatchers("/actuator/**").permitAll()
                                                 .anyExchange().authenticated()//API accessible à tous les utilisateurs authentifiés
                 )
                 .oauth2ResourceServer(oauth2-> oauth2.jwt(Customizer.withDefaults()))//support de l'authentification JWT

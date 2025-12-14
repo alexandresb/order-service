@@ -7,6 +7,7 @@ plugins {
 ext {
 	springCloudVersion = "2023.0.3"
 	set('testKeycloakVersion',"3.6.0")
+	set('otelVersion', "2.4.0")
 }
 
 group = 'com.polarbookshop'
@@ -16,6 +17,10 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
+}
+
+springBoot{
+	buildInfo()
 }
 
 configurations {
@@ -57,6 +62,8 @@ dependencies {
 	runtimeOnly 'org.flywaydb:flyway-core'
 	runtimeOnly 'org.springframework:spring-jdbc'
 	runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	runtimeOnly "io.opentelemetry.javaagent:opentelemetry-javaagent:${otelVersion}"
 
 	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'org.postgresql:r2dbc-postgresql'

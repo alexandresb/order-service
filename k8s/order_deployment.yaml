@@ -17,6 +17,10 @@ spec:
       #déclaration du label permettant d'identifier le pod (doit correspondre à matchLabels ci-dessus)
       labels:
         app: order-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "9002"
     spec:
       containers:
         - name: order-service
@@ -46,4 +50,15 @@ spec:
             preStop:
               exec:
                 command: [ "sh", "-c", "sleep 5" ]
-      
+          livenessProbe:
+            httpGet:
+              port: 9002
+              path: /actuator/health/liveness
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              port: 9002
+              path: /actuator/health/readiness
+            initialDelaySeconds: 10
+            periodSeconds: 15
