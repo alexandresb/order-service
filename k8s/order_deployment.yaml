@@ -48,3 +48,10 @@ spec:
               path: /actuator/health/readiness
             initialDelaySeconds: 10
             periodSeconds: 15
+          volumeMounts:
+            - mountPath: /workspace/config
+              name: order-config-volume
+      volumes:
+        - name: order-config-volume
+          configMap:
+            name: order-config
