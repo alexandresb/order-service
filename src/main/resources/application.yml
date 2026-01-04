@@ -17,11 +17,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/polardb_order
 
   config:
-    #importation / récup des propriétés de config depuis un serveur de config quand il y en a 1 de dispo
-    import: "optional:configserver:"
+    import: "" #"optional:configserver:"
 
   cloud:
     config:
+      enabled: false
       uri: http://localhost:8888 #URI par défaut
       #resilience du client de config
       request-connect-timeout: 5000 #en ms - temps max pour établir une cnx avec le config server
@@ -33,6 +33,7 @@ spring:
         initial-interval: 1000 # en ms. interval de temps écoulé avant la 1ere nouvelle tentative (retry)
         max-interval: 2000 #interval max pour une tentative - délai à ne pas excéder
         multiplier: 1.1 # facteur pour calculer le délai qui doit s'écouler avant la tentative suivante
+
     function:
       definition: consumeOrderDispatchedMessages #déclaration de la prise en charge de la fonction par SCF
     stream:

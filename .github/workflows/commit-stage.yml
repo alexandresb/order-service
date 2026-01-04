@@ -38,18 +38,19 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
-      - name: Setup Kubeconform
+      - name: Setup KubeTools
         uses: alexellis/setup-arkade@v3
-      - name: Install Kubeconform
+      - name: Install KubeTools
         uses: alexellis/arkade-get@master
         with:
+          kustomize: latest
           kubeconform: latest
       - name: Validate Kubernetes manifests
         run: |
-          kubeconform -strict k8s
+          kustomize build k8s | kubeconform --strict -
   package:
     name: Package and Publish
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/v2' }}
     needs: [ build ]
     runs-on: ubuntu-22.04
     permissions:
