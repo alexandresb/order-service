@@ -15,25 +15,8 @@ spring:
     user: ${spring.r2dbc.username}
     password: ${spring.r2dbc.password}
     url: jdbc:postgresql://localhost:5432/polardb_order
-
-  config:
-    import: "" #"optional:configserver:"
-
+    
   cloud:
-    config:
-      enabled: false
-      uri: http://localhost:8888 #URI par défaut
-      #resilience du client de config
-      request-connect-timeout: 5000 #en ms - temps max pour établir une cnx avec le config server
-      request-read-timeout: 5000 #temps max pour que le container lise la config pour configurer le(s) bean(s)
-      fail-fast: false #true pour que le retry soit mis en oeuvre pour recontacter le config server
-      retry:
-        #utilisation des vals par défaut
-        max-attempts: 20 #j'ai mis 20 au lieu de 6 (val par défaut) pour tester le retry
-        initial-interval: 1000 # en ms. interval de temps écoulé avant la 1ere nouvelle tentative (retry)
-        max-interval: 2000 #interval max pour une tentative - délai à ne pas excéder
-        multiplier: 1.1 # facteur pour calculer le délai qui doit s'écouler avant la tentative suivante
-
     function:
       definition: consumeOrderDispatchedMessages #déclaration de la prise en charge de la fonction par SCF
     stream:
